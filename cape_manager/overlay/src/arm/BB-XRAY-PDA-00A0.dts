@@ -1,0 +1,76 @@
+/* Device tree file for BBBMINI */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/board/am335x-bbw-bbb-base.h>
+#include <dt-bindings/pinctrl/am33xx.h>
+
+/ {
+	compatible = "ti,beaglebone", "ti,beaglebone-black", "ti,beaglebone-green";
+
+	/* identification */
+	part-number = "BB-XRAY-PDA";
+	version = "00A0";
+
+	/* state the resources this cape uses */
+	exclusive-use =
+		/* PRU digital I/O */
+		"P8.27",	/* pru1: pr1_pru1_pru_r30_8, LED 1 */
+		"P8.29",	/* pru1: pr1_pru1_pru_r30_9, LED 2 */
+		"P8.39",	/* pru1: pr1_pru1_pru_r30_6  OE */
+		"P8.40",	/* pru1: pr1_pru1_pru_r30_7  OE2 */
+		"P8.41",	/* pru1: pr1_pru1_pru_r31_4, TRIG */
+		"P8.42",	/* pru1: pr1_pru1_pru_r31_5, EOS */
+		"P8.43",	/* pru1: pr1_pru1_pru_r30_2, SNS */
+		"P8.44",	/* pru1: pr1_pru1_pru_r30_3, RS */
+		"P8.45",	/* pru1: pr1_pru1_pru_r30_0, CLK */
+		"P8.46",	/* pru1: pr1_pru1_pru_r30_1, RESET */
+		"P9.39",	// AIN0
+		"P9.40",	// AIN1
+
+		/* the hardware ip uses */
+		"pru1",
+        "pruss",
+		"tscadc";
+
+	fragment@0 {
+		target = <&am33xx_pinmux>;
+		__overlay__ {
+			pru_pru_pins: pinmux_pru_pru_pins {
+				pinctrl-single,pins = <
+					BONE_P8_27 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_29 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_39 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_40 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_41 (PIN_INPUT | MUX_MODE6)
+					BONE_P8_42 (PIN_INPUT | MUX_MODE6)
+					BONE_P8_43 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_44 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_45 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_46 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+				>;
+			};
+		};
+	};
+			
+    fragment@1 {
+        target = <&pruss>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&pru_pru_pins>;
+        };
+    };
+
+    fragment@2 {
+		target = <&tscadc>;
+		__overlay__ {
+			status = "okay";
+			adc {
+				ti,adc-channels = <0 1>;
+			};
+		};
+   };
+    
+};

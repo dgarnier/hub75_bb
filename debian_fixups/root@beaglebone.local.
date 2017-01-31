@@ -1,0 +1,48 @@
+#!/bin/bash 
+
+usage="$(basename "$0") [-h] mountpoint nfs_server:directory"
+
+while getopts ":h" opt; do
+  case $opt in
+    a)
+      echo $usage >&2
+      exit 1
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ $# != 2 ] ; then
+    echo "illegal number of arguments"
+    exit 1
+fi
+
+FILE="/etc/apt/sources.list.d/testing.list"
+if (! -f $FILE) ; then
+/bin/cat <<EOF >$FILE
+deb http://httpredir.debian.org/debian/ testing main contrib non-free
+EOF
+
+FILE="/etc/apt/preferences.d/testing.pref"
+/bin/cat <<EOF >$FILE
+Package: *
+Pin: release a=testing
+Pin-Priority: 75
+EOF
+
+apt-get update
+apt-get -y -t testing install rpcbind
+apt-get -y install nfs-common autofs
+fi
+
+mkdir -p $1
+/bin/cat <<EOF >>/etc/fstab
+$2 $1 nfs noauto,x-systemd.automount,x-systemd.device-timeout=10,timeo=14,x-systemd.idle-timeout=1min 0 0
+EOF
+
+mount $1
+
+

@@ -1,0 +1,86 @@
+# 1 "src/arm/BB-LED-ARRAY-00A0.dts"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "src/arm/BB-LED-ARRAY-00A0.dts"
+# 12 "src/arm/BB-LED-ARRAY-00A0.dts"
+/dts-v1/;
+/plugin/;
+
+# 1 "include/dt-bindings/board/am335x-bbw-bbb-base.h" 1
+# 16 "src/arm/BB-LED-ARRAY-00A0.dts" 2
+# 1 "include/dt-bindings/gpio/gpio.h" 1
+# 17 "src/arm/BB-LED-ARRAY-00A0.dts" 2
+# 1 "include/dt-bindings/pinctrl/am33xx.h" 1
+
+
+
+
+
+
+
+# 1 "include/dt-bindings/pinctrl/omap.h" 1
+# 9 "include/dt-bindings/pinctrl/am33xx.h" 2
+# 18 "src/arm/BB-LED-ARRAY-00A0.dts" 2
+
+
+/ {
+ compatible = "ti,beaglebone", "ti,beaglebone-black", "ti,beaglebone-green";
+
+
+ part-number = "BB-LED_ARRAY";
+ version = "00A0";
+
+
+ exclusive-use =
+
+  "P8.27",
+  "P8.28",
+  "P8.29",
+  "P8.30",
+  "P8.39",
+  "P8.40",
+  "P8.41",
+  "P8.42",
+  "P8.43",
+  "P8.44",
+  "P8.45",
+  "P8.46",
+
+
+  "pruss",
+  "pru0",
+  "pru1"
+  ;
+
+ fragment@0 {
+  target = <&am33xx_pinmux>;
+  __overlay__ {
+   pru_pru_pins: pinmux_pru_pru_pins {
+    pinctrl-single,pins = <
+     0x0E0 (0 | 5)
+     0x0E8 (0 | 5)
+     0x0E4 (0 | 5)
+     0x0EC (0 | 5)
+     0x0B8 (0 | 5)
+     0x0BC (0 | 5)
+     0x0B0 (0 | 5)
+     0x0B4 (0 | 5)
+     0x0A8 (0 | 5)
+     0x0AC (0 | 5)
+     0x0A0 (0 | 5)
+     0x0A4 (0 | 5)
+    >;
+   };
+  };
+ };
+
+  fragment@1 {
+  target = <&pruss>;
+  __overlay__ {
+   status = "okay";
+   pinctrl-names = "default";
+   pinctrl-0 = <&pru_pru_pins>;
+  };
+ };
+# 227 "src/arm/BB-LED-ARRAY-00A0.dts"
+};

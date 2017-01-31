@@ -1,0 +1,227 @@
+/*
+ * Copyright (C) 2016 Darren Garnier <dgarnier@reinrag.net>
+ *
+ * This cape runs color LED array modules using HUB75 connectors with
+ * 1/8 scan. (typical of 16 x 32 array modules)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+ 
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/board/am335x-bbw-bbb-base.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/am33xx.h>
+
+
+/ {
+	compatible = "ti,beaglebone", "ti,beaglebone-black", "ti,beaglebone-green";
+
+	/* identification */
+	part-number = "BB-LED_ARRAY";
+	version = "00A0";
+
+	/* state the resources this cape uses */
+	exclusive-use =
+		/* PRU digital I/O */
+		"P8.27",	/* pru1: pr1_pru1_pru_r30_8,  B   */
+		"P8.28",	/* pru1: pr1_pru1_pru_r30_10, LAT */
+		"P8.29",	/* pru1: pr1_pru1_pru_r30_9,  C   */
+		"P8.30",	/* pru1: pr1_pru1_pru_r30_11, OE  */
+		"P8.39",	/* pru1: pr1_pru1_pru_r30_6,  CLK */
+		"P8.40",	/* pru1: pr1_pru1_pru_r30_7,  A   */
+		"P8.41",	/* pru1: pr1_pru1_pru_r30_4,  G2  */
+		"P8.42",	/* pru1: pr1_pru1_pru_r30_5,  B2  */
+		"P8.43",	/* pru1: pr1_pru1_pru_r30_2,  B1  */
+		"P8.44",	/* pru1: pr1_pru1_pru_r30_3,  R2  */
+		"P8.45",	/* pru1: pr1_pru1_pru_r30_0,  R1  */
+		"P8.46",	/* pru1: pr1_pru1_pru_r30_1,  G1  */
+
+		/* the hardware ip uses */
+		"pruss",
+		"pru0",
+		"pru1"
+		;
+
+	fragment@0 {
+		target = <&am33xx_pinmux>;
+		__overlay__ {
+			pru_pru_pins: pinmux_pru_pru_pins {
+				pinctrl-single,pins = <
+					BONE_P8_27 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_28 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_29 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_30 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_39 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_40 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_41 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_42 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_43 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_44 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_45 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+					BONE_P8_46 (PIN_OUTPUT_PULLDOWN | MUX_MODE5)
+				>;
+			};
+		};
+	};
+	
+	 fragment@1 {
+		target = <&pruss>;
+		__overlay__ {
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pru_pru_pins>;
+		};
+	};
+		
+/*	
+	 fragment@2 {
+		target = <&pruss>;
+		__overlay__ {
+			status = "okay";
+			compatible = "ti,am3352-pruss";
+			ti,hwmods = "pruss";
+			reg = <0x4a300000 0x2000>,
+			      <0x4a302000 0x2000>,
+			      <0x4a310000 0x3000>,
+			      <0x4a326000 0x2000>,
+			      <0x4a32e000 0x31c>,
+			      <0x4a332000 0x58>;
+			reg-names = "dram0", "dram1", "shrdram2", "cfg",
+				    "iep", "mii_rt";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			ranges;
+			
+			pinctrl-names = "default";
+			pinctrl-0 = <&pru_pru_pins>;
+			
+
+			pruss_intc: intc@4a320000 {
+				compatible = "ti,am3352-pruss-intc";
+				reg = <0x4a320000 0x2000>;
+				reg-names = "intc";
+				interrupts = <20 21 22 23 24 25 26 27>;
+				interrupt-names = "host2", "host3", "host4",
+						  "host5", "host6", "host7",
+						  "host8", "host9";
+				interrupt-controller;
+				#interrupt-cells = <1>;
+			};
+
+			pru0: pru0@4a334000 {
+				compatible = "ti,am3352-pru";
+				reg = <0x4a334000 0x2000>,
+				      <0x4a322000 0x400>,
+				      <0x4a322400 0x100>;
+				reg-names = "iram", "control", "debug";
+				interrupt-parent = <&pruss_intc>;
+				interrupts = <16>, <17>;
+				interrupt-names = "vring", "kick";
+			};
+
+			pru1: pru1@4a338000 {
+				compatible = "ti,am3352-pru";
+				reg = <0x4a338000 0x2000>,
+				      <0x4a324000 0x400>,
+				      <0x4a324400 0x100>;
+				reg-names = "iram", "control", "debug";
+				interrupt-parent = <&pruss_intc>;
+				interrupts = <18>, <19>;
+				interrupt-names = "vring", "kick";
+			};
+
+			pruss_mdio: mdio@4a332400 {
+				compatible = "ti,davinci_mdio";
+				reg = <0x4a332400 0x90>;
+				clocks = <&dpll_core_m4_ck>;
+				clock-names = "fck";
+				bus_freq = <1000000>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				status = "disabled";
+			};
+		};
+	};
+*/	
+	
+/*
+	 fragment@34 {
+		target = <&ocp>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			pruss: pruss@4a300000 {
+				status = "okay";
+				compatible = "ti,am3352-pruss";
+				ti,hwmods = "pruss";
+				reg = <0x4a300000 0x2000>,
+				      <0x4a302000 0x2000>,
+				      <0x4a310000 0x3000>,
+				      <0x4a326000 0x2000>,
+				      <0x4a32e000 0x31c>,
+				      <0x4a332000 0x58>;
+				reg-names = "dram0", "dram1", "shrdram2", "cfg",
+					    "iep", "mii_rt";
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges;
+				
+				pinctrl-names = "default";
+				pinctrl-0 = <&pru_pru_pins>;
+				
+
+				pruss_intc: intc@4a320000 {
+					compatible = "ti,am3352-pruss-intc";
+					reg = <0x4a320000 0x2000>;
+					reg-names = "intc";
+					interrupts = <20 21 22 23 24 25 26 27>;
+					interrupt-names = "host2", "host3", "host4",
+							  "host5", "host6", "host7",
+							  "host8", "host9";
+					interrupt-controller;
+					#interrupt-cells = <1>;
+				};
+
+				pru0: pru0@4a334000 {
+					compatible = "ti,am3352-pru";
+					reg = <0x4a334000 0x2000>,
+					      <0x4a322000 0x400>,
+					      <0x4a322400 0x100>;
+					reg-names = "iram", "control", "debug";
+					interrupt-parent = <&pruss_intc>;
+					interrupts = <16>, <17>;
+					interrupt-names = "vring", "kick";
+				};
+
+				pru1: pru1@4a338000 {
+					compatible = "ti,am3352-pru";
+					reg = <0x4a338000 0x2000>,
+					      <0x4a324000 0x400>,
+					      <0x4a324400 0x100>;
+					reg-names = "iram", "control", "debug";
+					interrupt-parent = <&pruss_intc>;
+					interrupts = <18>, <19>;
+					interrupt-names = "vring", "kick";
+				};
+
+				pruss_mdio: mdio@4a332400 {
+					compatible = "ti,davinci_mdio";
+					reg = <0x4a332400 0x90>;
+					clocks = <&dpll_core_m4_ck>;
+					clock-names = "fck";
+					bus_freq = <1000000>;
+					#address-cells = <1>;
+					#size-cells = <0>;
+					status = "disabled";
+				};
+			};
+		};
+	};
+*/
+
+};

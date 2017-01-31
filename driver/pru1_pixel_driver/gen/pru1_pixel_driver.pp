@@ -1,0 +1,11 @@
+gen/pru1_pixel_driver.object: pru1_pixel_driver.c
+gen/pru1_pixel_driver.object: /usr/share/ti/cgt-pru/include/stdint.h
+gen/pru1_pixel_driver.object: /opt/source/pru-software-support-package/include/am335x/pru_cfg.h
+gen/pru1_pixel_driver.object: /opt/source/pru-software-support-package/include/am335x/pru_intc.h
+gen/pru1_pixel_driver.object: /opt/source/pru-software-support-package/include/am335x/pru_iep.h
+gen/pru1_pixel_driver.object: rsc_table_pru.h
+gen/pru1_pixel_driver.object: /usr/share/ti/cgt-pru/include/stddef.h
+gen/pru1_pixel_driver.object: /opt/source/pru-software-support-package/include/rsc_types.h
+gen/pru1_pixel_driver.object: /opt/source/pru-software-support-package/include/pru_types.h
+gen/pru1_pixel_driver.object: /opt/source/pru-software-support-package/include/pru_virtio_ids.h
+gen/pru1_pixel_driver.object: panel_wiring.h

@@ -1,0 +1,3 @@
+BB-XRAY-PDA-00A0.o: src/arm/BB-XRAY-PDA-00A0.dts \
+ include/dt-bindings/board/am335x-bbw-bbb-base.h \
+ include/dt-bindings/pinctrl/am33xx.h include/dt-bindings/pinctrl/omap.h
